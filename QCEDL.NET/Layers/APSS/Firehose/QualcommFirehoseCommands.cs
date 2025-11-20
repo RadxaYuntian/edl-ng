@@ -945,6 +945,7 @@ public static class QualcommFirehoseCommands
         firehose.Serial.SendData(Encoding.UTF8.GetBytes(eraseCommandXml));
 
         var finalAckOrNakReceived = false;
+        var logReceived = false;
         var success = false;
         var attempts = 0;
 
@@ -987,6 +988,7 @@ public static class QualcommFirehoseCommands
             {
                 if (data.Log != null)
                 {
+                    logReceived = true;
                     LibraryLogger.Debug("DEVPRG LOG: " + data.Log.Value);
                 }
                 else if (data.Response != null)
@@ -1010,6 +1012,12 @@ public static class QualcommFirehoseCommands
                     finalAckOrNakReceived = true;
                     break;
                 }
+            }
+
+            if (logReceived)
+            {
+                attempts--;
+                logReceived = false;
             }
         }
 
